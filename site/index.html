@@ -23,8 +23,9 @@
             <p class="intro-desc">OpenStreetMap, Google Maps và Street View cùng một điểm. Di chuyển, phóng to, thu nhỏ bằng cử chỉ trước camera — không cần chạm màn hình hay nhập API key.</p>
           </div>
           <div class="intro-actions">
-            <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span>Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
+            <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span id="camera-button-label">Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
             <button id="camera-stop" class="outline-button" type="button" disabled>Dừng camera</button>
+            <p id="camera-inline-status" class="camera-inline-status" role="status" aria-live="polite">Sẵn sàng bật camera</p>
             <p class="privacy-line">Camera chỉ xử lý cử chỉ trên thiết bị của bạn.</p>
           </div>
         </section>

@@ -7,8 +7,8 @@
     <meta name="description" content="Vietflex Không Chạm: OpenStreetMap, Google Maps và Street View cùng tọa độ, điều khiển bằng một bàn tay qua camera, không cần API key." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Không Chạm — Vietflex Maps</title>
-    <script type="module" crossorigin src="/khongcham/assets/index-DK6HAsd5.js"></script>
-    <link rel="stylesheet" crossorigin href="/khongcham/assets/index-CYi6SsUr.css">
+    <script type="module" crossorigin src="/khongcham/assets/index-DpVvJuAu.js"></script>
+    <link rel="stylesheet" crossorigin href="/khongcham/assets/index-DluAhBDE.css">
   </head>
   <body>
     <div id="app">
@@ -25,8 +25,9 @@
             <p class="intro-desc">OpenStreetMap, Google Maps và Street View cùng một điểm. Di chuyển, phóng to, thu nhỏ bằng cử chỉ trước camera — không cần chạm màn hình hay nhập API key.</p>
           </div>
           <div class="intro-actions">
-            <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span>Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
+            <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span id="camera-button-label">Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
             <button id="camera-stop" class="outline-button" type="button" disabled>Dừng camera</button>
+            <p id="camera-inline-status" class="camera-inline-status" role="status" aria-live="polite">Sẵn sàng bật camera</p>
             <p class="privacy-line">Camera chỉ xử lý cử chỉ trên thiết bị của bạn.</p>
           </div>
         </section>

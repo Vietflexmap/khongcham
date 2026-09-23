@@ -21,6 +21,8 @@ const startButton = element<HTMLButtonElement>('camera-start');
 const stopButton = element<HTMLButtonElement>('camera-stop');
 const cameraPill = element<HTMLElement>('camera-pill');
 const cameraStatus = element<HTMLElement>('gesture-status');
+const cameraInlineStatus = element<HTMLElement>('camera-inline-status');
+const cameraButtonLabel = element<HTMLElement>('camera-button-label');
 const videoContainer = element<HTMLElement>('video-container');
 const videoEmpty = element<HTMLElement>('video-empty');
 const mapFrame = element<HTMLIFrameElement>('map-google');
@@ -59,6 +61,14 @@ let starting = false;
 let cameraSession = 0;
 let gesture = new OneHandGesture();
 let lastStatus = '';
+
+function showCameraStatus(message: string, mode = ''): void {
+  for (const target of [cameraStatus, cameraInlineStatus]) {
+    target.textContent = message;
+    if (mode) target.dataset.mode = mode;
+    else delete target.dataset.mode;
+  }
+}
 
 function refreshReadout(): void {
   const center = osm.getCenter();
@@ -171,8 +181,7 @@ function setStatus(result: GestureResult): void {
   };
   if (result.status === lastStatus) return;
   lastStatus = result.status;
-  cameraStatus.textContent = messages[result.status];
-  cameraStatus.dataset.mode = result.status;
+  showCameraStatus(messages[result.status], result.status);
 }
 
 function handleFrame(frame: GestureFrame): void {
@@ -187,7 +196,7 @@ function handleFrame(frame: GestureFrame): void {
   }
 }
 
-function stopCamera(): void {
+function stopCamera(message = 'Camera đã tắt', isError = false): void {
   cameraSession += 1;
   engine?.stop();
   engine = null;
@@ -198,10 +207,10 @@ function stopCamera(): void {
   videoEmpty.hidden = false;
   startButton.disabled = false;
   stopButton.disabled = true;
-  cameraPill.textContent = 'CAMERA TẮT';
+  cameraPill.textContent = isError ? 'CAMERA LỖI' : 'CAMERA TẮT';
   cameraPill.classList.remove('is-live');
-  cameraStatus.textContent = 'Camera đã tắt';
-  delete cameraStatus.dataset.mode;
+  cameraButtonLabel.textContent = isError ? 'Thử lại camera' : 'Bật camera & bắt đầu';
+  showCameraStatus(message, isError ? 'error' : '');
 }
 
 startButton.addEventListener('click', async () => {
@@ -210,8 +219,9 @@ startButton.addEventListener('click', async () => {
   starting = true;
   startButton.disabled = true;
   stopButton.disabled = false;
+  cameraButtonLabel.textContent = 'Đang bật camera…';
   cameraPill.textContent = 'ĐANG KHỞI TẠO';
-  cameraStatus.textContent = 'Đang yêu cầu quyền truy cập camera…';
+  showCameraStatus('Đang yêu cầu quyền truy cập camera…');
   const next = new CameraGestureController(
     handleFrame,
     (video) => {
@@ -219,11 +229,14 @@ startButton.addEventListener('click', async () => {
       videoContainer.prepend(video);
       videoEmpty.hidden = true;
     },
-    (message) => { if (session === cameraSession) cameraStatus.textContent = message; },
+    (message) => {
+      if (session !== cameraSession) return;
+      lastStatus = '';
+      showCameraStatus(message);
+    },
     (error) => {
       if (session !== cameraSession) return;
-      stopCamera();
-      cameraStatus.textContent = error.message;
+      stopCamera(error.message, true);
     },
   );
   engine = next;
@@ -233,14 +246,14 @@ startButton.addEventListener('click', async () => {
     gesture = new OneHandGesture();
     cameraPill.textContent = 'CAMERA ĐANG BẬT';
     cameraPill.classList.add('is-live');
-    cameraStatus.textContent = 'Đưa một bàn tay mở vào khung hình';
+    cameraButtonLabel.textContent = 'Camera đang bật';
+    showCameraStatus('Đưa một bàn tay mở vào khung hình');
   } catch (error) {
     if (session !== cameraSession) return;
-    stopCamera();
-    cameraStatus.textContent = error instanceof Error ? error.message : 'Không thể khởi động camera.';
+    stopCamera(error instanceof Error ? error.message : 'Không thể khởi động camera.', true);
   } finally {
     if (session === cameraSession) starting = false;
   }
 });
-stopButton.addEventListener('click', stopCamera);
-window.addEventListener('pagehide', stopCamera);
+stopButton.addEventListener('click', () => stopCamera());
+window.addEventListener('pagehide', () => stopCamera());

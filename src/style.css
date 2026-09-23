@@ -55,6 +55,9 @@ footer{border-top:1px solid var(--line);max-width:1440px;margin:auto;padding:24p
 .map-footer>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sync-note{font-size:11px;line-height:1.7;color:#acbab1;margin:13px 0 0}
 .bottom-strip a{color:var(--lime)}
+.camera-inline-status{font-size:11px;line-height:1.55;color:#c7d3c8;margin:0;min-height:18px}
+.camera-inline-status[data-mode="error"],.camera-status[data-mode="error"]{color:#ffc4ad}
+.camera-inline-status[data-mode="ready"],.camera-inline-status[data-mode="panning"],.camera-inline-status[data-mode="zooming"]{color:var(--lime)}
 @media(max-width:1150px) and (min-width:761px){.workspace{grid-template-columns:repeat(2,minmax(0,1fr))}.map-card-street{grid-column:1/-1}.map-card-street .map-container{height:400px}}
 @media(max-width:760px){.location-form{grid-template-columns:1fr auto;padding:12px}.location-form label{grid-column:1/-1}.location-form #location-status{grid-column:1/-1}.map-card-street{grid-column:auto}.map-container{height:350px}}
 @media(max-width:390px){.map-footer{font-size:8px}.map-footer a{white-space:normal;text-align:right}.map-heading p{font-size:9px}}
