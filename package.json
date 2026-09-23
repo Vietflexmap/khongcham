@@ -1,0 +1,22 @@
+{
+  "name": "vietflex-khongcham",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@map-gesture-controls/core": "1.0.0",
+    "leaflet": "1.9.4"
+  },
+  "devDependencies": {
+    "@types/google.maps": "3.66.3",
+    "@types/leaflet": "1.9.22",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  }
+}

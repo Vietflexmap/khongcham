@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111d20" />
+    <meta name="description" content="Vietflex Không Chạm: điều khiển bản đồ OSM và Google Maps bằng một bàn tay qua camera." />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Không Chạm — Vietflex Maps</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Không Chạm, trang chủ"><span class="brand-icon" aria-hidden="true">✳</span><span>VIETFLEX<span class="brand-accent"> / KHÔNG CHẠM</span></span></a>
+        <div class="topbar-right"><span class="topbar-tag">PHÒNG THÍ NGHIỆM BẢN ĐỒ</span><span class="topbar-dot"></span><span id="camera-pill">CAMERA TẮT</span></div>
+      </header>
+
+      <main class="layout">
+        <section class="intro" aria-labelledby="hero-title">
+          <div class="intro-copy">
+            <p class="eyebrow"><span class="line"></span> BẢN ĐỒ ĐIỀU KHIỂN BẰNG CỬ CHỈ <span class="eyebrow-number">01 / 02</span></p>
+            <h1 id="hero-title">Hai bản đồ.<br /><em>Một bàn tay.</em></h1>
+            <p class="intro-desc">Khám phá cùng lúc OpenStreetMap và Google Maps. Di chuyển, phóng to, thu nhỏ bằng cử chỉ trước camera — không cần chạm màn hình.</p>
+          </div>
+          <div class="intro-actions">
+            <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span>Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
+            <button id="camera-stop" class="outline-button" type="button" disabled>Dừng camera</button>
+            <p class="privacy-line">Camera chỉ xử lý cử chỉ trên thiết bị của bạn.</p>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="Hai bản đồ đồng bộ">
+          <div class="map-card map-card-osm">
+            <div class="map-heading"><div class="map-title"><span class="map-index">01</span><div><h2>OpenStreetMap</h2><p>Bản đồ tương tác · Điều khiển chính</p></div></div><span class="map-type">BẢN ĐỒ ĐƯỜNG</span></div>
+            <div class="map-container" id="map-osm" aria-label="Bản đồ OpenStreetMap có thể kéo và thu phóng"></div>
+            <div class="map-footer"><span><span class="live-dot"></span> CỬ CHỈ & CHUỘT</span><span id="osm-coordinates">—</span></div>
+          </div>
+
+          <div class="map-card map-card-google">
+            <div class="map-heading"><div class="map-title"><span class="map-index">02</span><div><h2>Google Maps / Earth</h2><p>Cùng tọa độ · Chế độ vệ tinh</p></div></div><span class="map-type map-type-google">ẢNH VỆ TINH</span></div>
+            <div class="map-container google-container">
+              <div id="map-google" class="google-map" aria-label="Bản đồ Google Maps đồng bộ với OpenStreetMap"></div>
+              <div id="google-setup" class="google-setup"><span class="google-symbol" aria-hidden="true">◎</span><h3>Kết nối Google Maps</h3><p>Nhập khóa Maps JavaScript API để hiển thị ảnh vệ tinh và đồng bộ hai bản đồ.</p><form id="google-form"><label for="google-key">GOOGLE MAPS API KEY</label><div class="key-field"><input id="google-key" name="key" type="text" autocomplete="off" spellcheck="false" placeholder="Nhập API key…" required /><button type="submit" aria-label="Kết nối Google Maps">↗</button></div></form><small>Khóa chỉ dùng trong phiên này. Hãy giới hạn khóa theo tên miền và Maps JavaScript API.</small><p id="google-error" class="google-error" role="alert" hidden></p></div>
+            </div>
+            <div class="map-footer"><span id="google-sync"><span class="sync-dot"></span> CHỜ KẾT NỐI</span><a id="earth-link" href="https://earth.google.com/web/" target="_blank" rel="noopener noreferrer">MỞ GOOGLE EARTH <span aria-hidden="true">↗</span></a></div>
+          </div>
+        </section>
+
+        <section class="control-panel" aria-label="Hướng dẫn điều khiển cử chỉ">
+          <div class="control-lead"><span class="section-kicker">CÁCH ĐIỀU KHIỂN</span><h2>Cử chỉ tự nhiên.<br />Bản đồ trong tầm tay.</h2><p>Đưa một bàn tay vào khung hình, giữ ổn định để lấy mốc. Chuyển cử chỉ để chọn thao tác.</p></div>
+          <ol class="gesture-list">
+            <li><span class="gesture-graphic hand-open" aria-hidden="true">✋</span><div><span class="gesture-num">01 — HIỆU CHUẨN</span><h3>Giữ bàn tay mở</h3><p>Giữ yên khoảng 0,7 giây để lấy mốc.</p></div></li>
+            <li><span class="gesture-graphic" aria-hidden="true">✊</span><div><span class="gesture-num">02 — DI CHUYỂN</span><h3>Nắm tay và di chuyển</h3><p>Đưa tay theo hướng muốn dịch bản đồ.</p></div></li>
+            <li><span class="gesture-graphic" aria-hidden="true">🤏</span><div><span class="gesture-num">03 — THU PHÓNG</span><h3>Chụm ngón, đưa lên / xuống</h3><p>Chụm trỏ và cái, mở các ngón còn lại. Đưa lên để phóng to.</p></div></li>
+          </ol>
+          <div class="camera-card"><div class="camera-top"><span><span class="camera-live-dot"></span> CAMERA TRỰC TIẾP</span><span>LOCAL PROCESSING</span></div><div id="video-container" class="video-container"><div id="video-empty" class="video-empty"><span aria-hidden="true">◉</span><p>Camera chưa được bật</p></div><div class="video-crosshair" aria-hidden="true"></div></div><div id="gesture-status" class="camera-status" role="status" aria-live="polite">Sẵn sàng bắt đầu</div></div>
+        </section>
+
+        <div class="bottom-strip"><span id="view-readout">TỌA ĐỘ — · ZOOM —</span><span>OSM © CỘNG ĐỒNG OPENSTREETMAP · GOOGLE MAPS © GOOGLE</span></div>
+      </main>
+      <footer><span>VIETFLEXMAP © 2026</span><span>ĐIỀU KHIỂN KHÔNG CHẠM / WEBGIS THỬ NGHIỆM</span><a href="https://github.com/sanderdesnaijer/map-gesture-controls" target="_blank" rel="noopener noreferrer">CÔNG NGHỆ CỬ CHỈ ↗</a></footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
