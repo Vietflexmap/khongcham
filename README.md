@@ -1,35 +1,35 @@
 # Vietflex Không Chạm
 
-WebGIS dùng một bàn tay để điều khiển đồng thời OpenStreetMap (Leaflet) và Google Maps. Bộ phân loại cử chỉ sử dụng [`@map-gesture-controls/core`](https://github.com/sanderdesnaijer/map-gesture-controls) của Sander de Snaijer; camera dùng MediaPipe Tasks Vision có đường dự phòng CPU khi WebGL/GPU không khả dụng. Lớp điều khiển riêng ánh xạ nắm tay thành pan, chụm ngón + lên/xuống thành zoom. Google Maps nhúng dùng API chính thức. Camera chạy trong trình duyệt, không truyền khung hình đến máy chủ của dự án.
+WebGIS điều khiển bằng một bàn tay qua camera. Ba góc nhìn dùng chung tâm: OpenStreetMap (Leaflet), Google Maps nhúng và Google Street View 360° nhúng. Google Earth mở ở tọa độ hiện tại trong tab riêng. Chế độ nhúng Google Maps / Street View được chuyển từ [Vietflexmap/xemduong](https://github.com/Vietflexmap/xemduong/blob/main/app.js); không nhập hoặc lưu API key, không tải Maps JavaScript API hay gọi backend của `xemduong`.
 
-## Thử tại máy
+## Chạy local
 
-Yêu cầu Node.js 22, camera và `localhost` (hoặc HTTPS):
+Cần Node.js 22, Internet và quyền camera trên `localhost` hoặc HTTPS.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Kiểm tra: `npm test && npm run build`.
+Kiểm tra: `npm test && npm run build && npm run sync:root && npm run check:root`.
 
-## Dùng bản đồ
+## Sử dụng
 
-1. Mở trang. Bản đồ OpenStreetMap hoạt động ngay khi có Internet.
-2. Nhập **Maps JavaScript API key** vào khung Google để mở Google Maps dạng vệ tinh. Bật Maps JavaScript API và cấu hình HTTP referrer cho `https://vietflexmap.github.io/khongcham/*` trong Google Cloud. Google Maps Platform yêu cầu cấu hình thanh toán cho triển khai thực tế. Khóa ở giao diện chỉ giữ trong bộ nhớ tab, không gửi cho máy chủ Vietflex và không ghi vào repo; như mọi khóa API trên trình duyệt, nó hiển thị trong các yêu cầu tới Google nên **phải giới hạn tên miền và API**. Nếu chưa có khóa, dùng liên kết **Mở Google Maps vệ tinh** để mở đúng tâm và mức zoom hiện tại trong tab mới; tab ngoài không tự đồng bộ sau khi mở.
-3. Bấm **Bật camera & bắt đầu**, cho phép camera. Lần đầu cần tải MediaPipe WASM và mô hình từ CDN. Nếu GPU không hoạt động, trang thử CPU. Khi không có camera hoặc từ chối quyền, trang báo lỗi dễ hiểu và bản đồ vẫn dùng chuột được.
-4. Đưa **một** bàn tay vào khung và giữ bàn tay mở, yên khoảng 0,7 giây để lấy mốc. Nắm tay và di chuyển để pan; chụm ngón trỏ và ngón cái (giữ những ngón còn lại mở), đưa tay lên/xuống để phóng to/thu nhỏ. Mở bàn tay để lấy mốc mới. Khi tay ra khỏi khung hình, cần lấy mốc lại.
-5. Không có camera, dùng chuột/bàn phím trên bản đồ OSM. Hai bản đồ đồng bộ tọa độ và mức zoom khi Google đã kết nối. Có thể kéo Google Maps để đồng bộ ngược lại. **Mở Google Earth** tìm cùng tọa độ trong tab khác; đường liên kết không điều khiển được camera/độ cao của Google Earth.
+1. Mở trang: bản đồ OSM, Google Maps vệ tinh và Street View hiển thị cùng tọa độ ban đầu. Có thể dán cặp tọa độ hoặc liên kết Google Maps chứa tọa độ vào ô **Đi đến vị trí**. Liên kết rút gọn không chứa tọa độ không thể giải trực tiếp trong trình duyệt.
+2. Kéo/thu phóng trên bản đồ OSM hoặc kéo/cuộn trên khung Google Maps để đổi tâm. Khung Google được điều khiển qua lớp kéo ở trang này, rồi hai iframe cập nhật sau khi dừng thao tác khoảng 0,85 giây. Đổi giữa bản đồ đường và vệ tinh bằng nút trong chân khung Google.
+3. Bật camera. Đưa một bàn tay mở vào khung hình, giữ yên khoảng 0,7 giây để lấy mốc. Nắm tay và di chuyển để pan; chụm ngón trỏ và ngón cái (giữ các ngón còn lại mở), đưa tay lên/xuống để zoom. Mở tay để lấy mốc mới. Camera và mô hình nhận dạng xử lý trong trình duyệt, không gửi hình tới máy chủ Vietflex.
+4. Dùng **Mở Google Maps**, **Mở Street View** hoặc **Google Earth** để xem tọa độ hiện tại trong tab khác. Liên kết Google Maps mang theo mức zoom, Earth dùng tìm kiếm tọa độ.
+
+## Giới hạn của chế độ không API
+
+Iframe Google Maps và Street View ở đây dùng các URL nhúng `output=embed` / `output=svembed` như mã nguồn `xemduong`. Đây là endpoint cũ, không phải giao diện Maps Embed API có hợp đồng ổn định; Google có thể thay đổi hoặc chặn hiển thị. Luôn có liên kết mở Google Maps và Street View ở vị trí tương ứng. Một số vị trí không có ảnh Street View.
+
+Iframe chạy khác nguồn nên trang không thể đọc thao tác di chuyển *bên trong* ảnh Street View hay trạng thái Google Maps; chỉ thao tác qua bản đồ OSM và lớp điều khiển bên trên Google Maps mới cập nhật cả ba khung. Google Earth mở ngoài trang, không đồng bộ khi tiếp tục di chuyển và không điều khiển được độ cao/góc nhìn. Nhúng và đồng bộ hai chiều bằng API chính thức cần API key và dịch vụ Google tương ứng. Không dùng tile Google không chính thức hay proxy tile qua backend.
+
+Cần Internet để tải OSM, Google, MediaPipe và phông chữ. Camera có đường dự phòng CPU nếu GPU không khả dụng; nếu quyền camera bị từ chối, bản đồ vẫn dùng bằng chuột/chạm.
 
 ## GitHub Pages
 
-Mã nguồn HTML nằm tại `site/index.html`; mã TypeScript nằm trong `src/`. Chạy `npm run build` để tạo `dist/`. Tệp `index.html`, `assets/` và `favicon.svg` ở gốc repo là bản build đã xuất, để Pages hoạt động cả khi nguồn phát hành đang chọn `main / (root)`; không sửa trực tiếp các tệp đã build này. Khi sửa mã nguồn, chạy `npm run build && npm run sync:root`, rồi commit các tệp tạo ra cùng mã nguồn. Workflow `.github/workflows/pages.yml` cũng kiểm thử, build và triển khai `dist` bằng GitHub Actions. Nên chọn **Settings → Pages → Build and deployment → Source: GitHub Actions** để chỉ có một luồng phát hành. URL: `https://vietflexmap.github.io/khongcham/`.
+Nguồn HTML: `site/index.html`; TypeScript: `src/`. Build ra `dist/`. Root `index.html`, `assets/` và `favicon.svg` là bản build cho Pages nhánh `main / (root)`; sau sửa nguồn chạy `npm run build && npm run sync:root`, commit cả nguồn và tệp build. Workflow `.github/workflows/pages.yml` kiểm thử và triển khai `dist` bằng Actions. URL: https://vietflexmap.github.io/khongcham/.
 
-## Giới hạn
-
-- Cần Internet để tải tile OpenStreetMap, Google Maps, MediaPipe và phông chữ. Không có chế độ offline.
-- Không có Google key thì khung Google hiển thị màn hình kết nối thay vì bản đồ vệ tinh. Không dùng tile Google không chính thức.
-- Cử chỉ có thể phụ thuộc góc camera và ánh sáng. Thao tác mở bàn tay lấy mốc giúp hạn chế rung và di chuyển nhầm.
-- Google Earth được mở bằng liên kết tìm kiếm tọa độ. Không thể nhúng hoặc điều khiển trực tiếp Earth trong tab này bằng Maps JavaScript API.
-
-Giấy phép thư viện cử chỉ: MIT, xem [thông báo bên thứ ba](THIRD_PARTY_NOTICES.md). Dữ liệu bản đồ © OpenStreetMap contributors; Google Maps © Google.
+Thư viện cử chỉ [`@map-gesture-controls/core`](https://github.com/sanderdesnaijer/map-gesture-controls), MIT; xem [thông báo bên thứ ba](THIRD_PARTY_NOTICES.md). Dữ liệu bản đồ © OpenStreetMap contributors; Google Maps và Street View © Google.

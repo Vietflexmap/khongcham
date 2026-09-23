@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111d20" />
-    <meta name="description" content="Vietflex Không Chạm: điều khiển bản đồ OSM và Google Maps bằng một bàn tay qua camera." />
+    <meta name="description" content="Vietflex Không Chạm: OpenStreetMap, Google Maps và Street View cùng tọa độ, điều khiển bằng một bàn tay qua camera, không cần API key." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Không Chạm — Vietflex Maps</title>
-    <script type="module" crossorigin src="/khongcham/assets/index-Bd5NYRyT.js"></script>
-    <link rel="stylesheet" crossorigin href="/khongcham/assets/index-_NDRTZ-5.css">
+    <script type="module" crossorigin src="/khongcham/assets/index-DolSPj3H.js"></script>
+    <link rel="stylesheet" crossorigin href="/khongcham/assets/index-CYi6SsUr.css">
   </head>
   <body>
     <div id="app">
@@ -20,9 +20,9 @@
       <main class="layout">
         <section class="intro" aria-labelledby="hero-title">
           <div class="intro-copy">
-            <p class="eyebrow"><span class="line"></span> BẢN ĐỒ ĐIỀU KHIỂN BẰNG CỬ CHỈ <span class="eyebrow-number">01 / 02</span></p>
-            <h1 id="hero-title">Hai bản đồ.<br /><em>Một bàn tay.</em></h1>
-            <p class="intro-desc">Khám phá cùng lúc OpenStreetMap và Google Maps. Di chuyển, phóng to, thu nhỏ bằng cử chỉ trước camera — không cần chạm màn hình.</p>
+            <p class="eyebrow"><span class="line"></span> BẢN ĐỒ ĐIỀU KHIỂN BẰNG CỬ CHỈ <span class="eyebrow-number">01 / 03</span></p>
+            <h1 id="hero-title">Một bàn tay.<br /><em>Ba góc nhìn.</em></h1>
+            <p class="intro-desc">OpenStreetMap, Google Maps và Street View cùng một điểm. Di chuyển, phóng to, thu nhỏ bằng cử chỉ trước camera — không cần chạm màn hình hay nhập API key.</p>
           </div>
           <div class="intro-actions">
             <button id="camera-start" class="primary-button" type="button"><span class="button-icon" aria-hidden="true">◉</span><span>Bật camera & bắt đầu</span><span aria-hidden="true">↗</span></button>
@@ -31,7 +31,14 @@
           </div>
         </section>
 
-        <section class="workspace" aria-label="Hai bản đồ đồng bộ">
+        <form id="location-form" class="location-form" aria-label="Đi đến tọa độ">
+          <label for="location-input">ĐI ĐẾN VỊ TRÍ</label>
+          <input id="location-input" type="text" autocomplete="off" spellcheck="false" placeholder="10.8259065, 106.6144391 hoặc dán link Google Maps" />
+          <button type="submit">ĐI ĐẾN <span aria-hidden="true">↗</span></button>
+          <span id="location-status" role="status" aria-live="polite">Cả ba khung cùng đi theo tâm bản đồ OSM.</span>
+        </form>
+
+        <section class="workspace" aria-label="Ba góc nhìn cùng tọa độ">
           <div class="map-card map-card-osm">
             <div class="map-heading"><div class="map-title"><span class="map-index">01</span><div><h2>OpenStreetMap</h2><p>Bản đồ tương tác · Điều khiển chính</p></div></div><span class="map-type">BẢN ĐỒ ĐƯỜNG</span></div>
             <div class="map-container" id="map-osm" aria-label="Bản đồ OpenStreetMap có thể kéo và thu phóng"></div>
@@ -39,14 +46,24 @@
           </div>
 
           <div class="map-card map-card-google">
-            <div class="map-heading"><div class="map-title"><span class="map-index">02</span><div><h2>Google Maps / Earth</h2><p>Cùng tọa độ · Chế độ vệ tinh</p></div></div><span class="map-type map-type-google">ẢNH VỆ TINH</span></div>
+            <div class="map-heading"><div class="map-title"><span class="map-index">02</span><div><h2>Google Maps</h2><p>Đi theo tâm OSM · Không dùng API key</p></div></div><span id="map-type-label" class="map-type map-type-google">ẢNH VỆ TINH</span></div>
             <div class="map-container google-container">
-              <div id="map-google" class="google-map" aria-label="Bản đồ Google Maps đồng bộ với OpenStreetMap"></div>
-              <div id="google-setup" class="google-setup"><span class="google-symbol" aria-hidden="true">◎</span><h3>Kết nối Google Maps</h3><p>Nhập khóa Maps JavaScript API để hiển thị ảnh vệ tinh và đồng bộ hai bản đồ.</p><form id="google-form"><label for="google-key">GOOGLE MAPS API KEY</label><div class="key-field"><input id="google-key" name="key" type="text" autocomplete="off" spellcheck="false" placeholder="Nhập API key…" required /><button type="submit" aria-label="Kết nối Google Maps">↗</button></div></form><small>Khóa chỉ dùng trong phiên này. Hãy giới hạn khóa theo tên miền và Maps JavaScript API.</small><a id="maps-link" class="google-external" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer">Chưa có khóa? Mở Google Maps vệ tinh ↗</a><p id="google-error" class="google-error" role="alert" hidden></p></div>
+              <iframe id="map-google" class="google-map" title="Google Maps tại tâm bản đồ OSM" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              <div id="google-pan-layer" class="google-pan-layer" role="application" aria-label="Kéo để di chuyển đồng thời OpenStreetMap, Google Maps và Street View" title="Kéo để di chuyển cả ba khung; cuộn để thu phóng"><span>✥ KÉO ĐỂ ĐỔI ĐIỂM</span></div>
             </div>
-            <div class="map-footer"><span id="google-sync"><span class="sync-dot"></span> CHỜ KẾT NỐI</span><a id="earth-link" href="https://earth.google.com/web/" target="_blank" rel="noopener noreferrer">MỞ GOOGLE EARTH <span aria-hidden="true">↗</span></a></div>
+            <div class="map-footer"><button id="map-type-button" class="inline-button" type="button" aria-pressed="true">Vệ tinh</button><a id="maps-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer">GOOGLE MAPS ↗</a><a id="earth-link" href="https://earth.google.com/web/" target="_blank" rel="noopener noreferrer">GOOGLE EARTH ↗</a></div>
+          </div>
+
+          <div class="map-card map-card-street">
+            <div class="map-heading"><div class="map-title"><span class="map-index">03</span><div><h2>Street View 360°</h2><p>Đi theo tâm bản đồ · Xem đường phố</p></div></div><span class="map-type map-type-google">CHẾ ĐỘ XEM ĐƯỜNG</span></div>
+            <div class="map-container street-container">
+              <iframe id="street-view" class="google-map" title="Google Street View 360 độ tại tâm bản đồ" loading="eager" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <div class="map-footer"><span id="street-status">ĐANG TẢI STREET VIEW…</span><button id="street-reload" class="inline-button" type="button" title="Tải lại vị trí trên Google Maps và Street View">TẢI LẠI ↻</button><a id="street-link" href="https://www.google.com/maps/" target="_blank" rel="noopener noreferrer">MỞ STREET VIEW ↗</a></div>
           </div>
         </section>
+
+        <p class="sync-note">Cử chỉ, kéo và thu phóng ở bản đồ sẽ cập nhật Google Maps cùng Street View sau khi dừng thao tác. Di chuyển bên trong ảnh Street View không đổi tâm bản đồ; một số vị trí chưa có ảnh đường phố. Google Earth mở cùng tọa độ trong tab mới.</p>
 
         <section class="control-panel" aria-label="Hướng dẫn điều khiển cử chỉ">
           <div class="control-lead"><span class="section-kicker">CÁCH ĐIỀU KHIỂN</span><h2>Cử chỉ tự nhiên.<br />Bản đồ trong tầm tay.</h2><p>Đưa một bàn tay vào khung hình, giữ ổn định để lấy mốc. Chuyển cử chỉ để chọn thao tác.</p></div>
@@ -58,7 +75,7 @@
           <div class="camera-card"><div class="camera-top"><span><span class="camera-live-dot"></span> CAMERA TRỰC TIẾP</span><span>LOCAL PROCESSING</span></div><div id="video-container" class="video-container"><div id="video-empty" class="video-empty"><span aria-hidden="true">◉</span><p>Camera chưa được bật</p></div><div class="video-crosshair" aria-hidden="true"></div></div><div id="gesture-status" class="camera-status" role="status" aria-live="polite">Sẵn sàng bắt đầu</div></div>
         </section>
 
-        <div class="bottom-strip"><span id="view-readout">TỌA ĐỘ — · ZOOM —</span><span>OSM © CỘNG ĐỒNG OPENSTREETMAP · GOOGLE MAPS © GOOGLE</span></div>
+        <div class="bottom-strip"><span id="view-readout">TỌA ĐỘ — · ZOOM —</span><span>OSM © CỘNG ĐỒNG OPENSTREETMAP · GOOGLE MAPS / STREET VIEW © GOOGLE · CHẾ ĐỘ NHÚNG TỪ <a href="https://github.com/Vietflexmap/xemduong" target="_blank" rel="noopener noreferrer">XEMDUONG</a></span></div>
       </main>
       <footer><span>VIETFLEXMAP © 2026</span><span>ĐIỀU KHIỂN KHÔNG CHẠM / WEBGIS THỬ NGHIỆM</span><a href="https://github.com/sanderdesnaijer/map-gesture-controls" target="_blank" rel="noopener noreferrer">CÔNG NGHỆ CỬ CHỈ ↗</a></footer>
     </div>
