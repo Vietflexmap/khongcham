@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { DEFAULT_TUNING_CONFIG, GestureController } from '@map-gesture-controls/core';
+import type { GestureFrame } from '@map-gesture-controls/core';
+import { CameraGestureController } from './camera';
 import { OneHandGesture, type GestureResult } from './gesture';
 import './style.css';
 
@@ -27,6 +28,7 @@ const googleSetup = element<HTMLElement>('google-setup');
 const googleError = element<HTMLElement>('google-error');
 const googleSync = element<HTMLElement>('google-sync');
 const earthLink = element<HTMLAnchorElement>('earth-link');
+const mapsLink = element<HTMLAnchorElement>('maps-link');
 
 const osm = L.map('map-osm', {
   zoomControl: false,
@@ -48,8 +50,9 @@ let googleMap: google.maps.Map | null = null;
 let lastForward: { lat: number; lng: number; zoom: number } | null = null;
 let forwardPending = false;
 let syncTimer: number | null = null;
-let engine: GestureController | null = null;
+let engine: CameraGestureController | null = null;
 let starting = false;
+let cameraSession = 0;
 let gesture = new OneHandGesture();
 let lastStatus = '';
 
@@ -63,6 +66,11 @@ function refreshReadout(): void {
   // Earth accepts coordinates in its search interface. It opens separately;
   // its camera altitude is not controlled by this page.
   earthLink.href = `https://earth.google.com/web/search/${lat},${lng}`;
+  const mapsParams = new URLSearchParams({
+    api: '1', map_action: 'map', center: `${lat},${lng}`,
+    zoom: String(Math.round(osm.getZoom())), basemap: 'satellite',
+  });
+  mapsLink.href = `https://www.google.com/maps/@?${mapsParams}`;
 }
 
 function syncToGoogle(): void {
@@ -108,7 +116,7 @@ function setStatus(result: GestureResult): void {
   cameraStatus.dataset.mode = result.status;
 }
 
-function handleFrame(frame: import('@map-gesture-controls/core').GestureFrame): void {
+function handleFrame(frame: GestureFrame): void {
   const result = gesture.update(frame);
   setStatus(result);
   if (result.action?.kind === 'pan') {
@@ -121,8 +129,10 @@ function handleFrame(frame: import('@map-gesture-controls/core').GestureFrame): 
 }
 
 function stopCamera(): void {
-  engine?.destroy();
+  cameraSession += 1;
+  engine?.stop();
   engine = null;
+  starting = false;
   gesture.reset();
   lastStatus = '';
   videoContainer.querySelector('video')?.remove();
@@ -137,36 +147,40 @@ function stopCamera(): void {
 
 startButton.addEventListener('click', async () => {
   if (starting || engine) return;
+  const session = ++cameraSession;
   starting = true;
   startButton.disabled = true;
+  stopButton.disabled = false;
   cameraPill.textContent = 'ĐANG KHỞI TẠO';
-  cameraStatus.textContent = 'Đang tải mô hình nhận diện bàn tay…';
-  const next = new GestureController(DEFAULT_TUNING_CONFIG, handleFrame);
+  cameraStatus.textContent = 'Đang yêu cầu quyền truy cập camera…';
+  const next = new CameraGestureController(
+    handleFrame,
+    (video) => {
+      if (session !== cameraSession) return;
+      videoContainer.prepend(video);
+      videoEmpty.hidden = true;
+    },
+    (message) => { if (session === cameraSession) cameraStatus.textContent = message; },
+    (error) => {
+      if (session !== cameraSession) return;
+      stopCamera();
+      cameraStatus.textContent = error.message;
+    },
+  );
+  engine = next;
   try {
-    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-      throw new Error('Camera yêu cầu HTTPS hoặc localhost và trình duyệt có hỗ trợ camera.');
-    }
-    const video = await next.init();
-    video.className = 'camera-video';
-    videoContainer.prepend(video);
-    videoEmpty.hidden = true;
-    await video.play();
+    await next.start();
+    if (session !== cameraSession) return;
     gesture = new OneHandGesture();
-    engine = next;
-    next.start();
     cameraPill.textContent = 'CAMERA ĐANG BẬT';
     cameraPill.classList.add('is-live');
-    stopButton.disabled = false;
     cameraStatus.textContent = 'Đưa một bàn tay mở vào khung hình';
   } catch (error) {
-    next.destroy();
-    videoContainer.querySelector('video')?.remove();
-    videoEmpty.hidden = false;
-    startButton.disabled = false;
-    cameraPill.textContent = 'CAMERA TẮT';
-    cameraStatus.textContent = error instanceof Error ? error.message : 'Không thể khởi động camera. Kiểm tra quyền truy cập và tải lại trang.';
+    if (session !== cameraSession) return;
+    stopCamera();
+    cameraStatus.textContent = error instanceof Error ? error.message : 'Không thể khởi động camera.';
   } finally {
-    starting = false;
+    if (session === cameraSession) starting = false;
   }
 });
 stopButton.addEventListener('click', stopCamera);
