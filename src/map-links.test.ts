@@ -17,5 +17,6 @@ describe('coordinate links without an API key', () => {
     expect(new URL(googleMapsUrl(point, 16)).searchParams.get('center')).toBe('10.8259065,106.6144391');
     expect(new URL(streetViewUrl(point)).searchParams.get('viewpoint')).toBe('10.8259065,106.6144391');
     expect(googleMapEmbed(point, 16)).not.toContain('key=');
+    expect(new URL(googleMapsUrl(point, 16, false)).searchParams.get('basemap')).toBe('roadmap');
   });
 });

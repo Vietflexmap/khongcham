@@ -43,10 +43,10 @@ export function streetViewEmbed(point: MapPoint, heading = 90): string {
   return `https://maps.google.com/maps?${params}`;
 }
 
-export function googleMapsUrl(point: MapPoint, zoom: number): string {
+export function googleMapsUrl(point: MapPoint, zoom: number, satellite = true): string {
   const params = new URLSearchParams({
     api: '1', map_action: 'map', center: safePoint(point),
-    zoom: String(Math.round(Math.max(1, Math.min(21, zoom)))), basemap: 'satellite',
+    zoom: String(Math.round(Math.max(1, Math.min(21, zoom)))), basemap: satellite ? 'satellite' : 'roadmap',
   });
   return `https://www.google.com/maps/@?${params}`;
 }

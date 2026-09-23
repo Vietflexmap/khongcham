@@ -70,7 +70,7 @@ function refreshReadout(): void {
   // Earth accepts coordinates in its search interface. It opens separately;
   // its camera altitude is not controlled by this page.
   earthLink.href = googleEarthUrl(center);
-  mapsLink.href = googleMapsUrl(center, osm.getZoom());
+  mapsLink.href = googleMapsUrl(center, osm.getZoom(), satellite);
   streetLink.href = streetViewUrl(center);
 }
 
@@ -113,6 +113,7 @@ element<HTMLButtonElement>('map-type-button').addEventListener('click', () => {
   button.textContent = satellite ? 'Vệ tinh' : 'Đường phố';
   button.setAttribute('aria-pressed', String(satellite));
   element('map-type-label').textContent = satellite ? 'ẢNH VỆ TINH' : 'BẢN ĐỒ ĐƯỜNG';
+  refreshReadout();
   syncToGoogle();
 });
 element<HTMLButtonElement>('street-reload').addEventListener('click', () => syncToGoogle(true));
